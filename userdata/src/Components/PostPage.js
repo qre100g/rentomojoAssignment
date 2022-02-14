@@ -3,10 +3,12 @@ import { useLocation , Link} from "react-router-dom";
 import '../App.css';
 
 function PostPage(props) {
-
+    const [postsBeforeFilter, setdata] = useState();
     const [posts, setPostsdata] = useState();
+    const [title, setTitle] = useState('');
     const location = useLocation();
-    const {userId} = location.state;
+    const {userId, userName} = location.state;
+    const mark = <mark>.....</mark>
 
     useEffect(() => {
         console.log(props);
@@ -14,22 +16,49 @@ function PostPage(props) {
             return res.json()
         }).then((res) => {
             setPostsdata(res);
+            setdata(res);
         })
     }, [])
 
+    useEffect(() => {
+        if(posts) {
+            setPostsdata(postsBeforeFilter.filter((e) => {
+                if(e.title.toLowerCase().indexOf(title.toLowerCase()) >= 0) {
+                    return e.title.replace(title, `<h5>title</h5>`);
+                } 
+            }))
+        }
+    }, [title])
+
     return (
         <div>
-            <h3>Posts By Mukesh</h3>
-            {posts ? <div className="flex"> 
+            <h3>Posts By {userName}</h3>
+
+            <div className="filtersField" style={{
+                justifyContent: 'center'
+            }}>
+                <span>Title: </span> 
+                <input
+                    placeholder="Enter Title"
+                    value = {title}
+                    onChange = {(e) => {
+                        setTitle(e.target.value);
+                    }}
+                />
+            </div>
+
+            {posts ? <div className="postContainer"> 
                 {console.log(posts)}
                 {posts.map((e) => {
                     return <div className="post"> 
+                        <h3>{e.title}</h3>
                         <Link to= "/postdetails" className="nodec" state = {{
                             userId: userId,
+                            userName: userName,
                             postId: e.id,
                             postdata : e
                         }}>
-                            <h3>{e.title}</h3>
+                            <h5>Post Details</h5>
                         </Link>
                     </div>
                 })}

@@ -1,22 +1,15 @@
 import { useEffect, useState } from "react";
 import { useLocation } from "react-router-dom";
 import '../App.css';
+import Delete from "./Delete";
 
 function Post(props) {
     const location = useLocation()
-    const {userId, postId, postdata} = location.state;
+    const {userId, userName, postId, postdata} = location.state;
 
-    const [userData, setUserData] = useState();
     const [commentsFlag, setCommentsFlag] = useState(false);
     const [commentsData, setCommentsData] = useState();
 
-    useEffect(() => {
-        fetch(`https://jsonplaceholder.typicode.com/users/${userId}`).then((res) => {
-            return res.json();
-        }).then((res) => {
-            setUserData(res);
-        })
-    }, [])
 
     useEffect(() => {
         fetch(`https://jsonplaceholder.typicode.com/comments?postId=${postId}`).then(res => {
@@ -27,19 +20,22 @@ function Post(props) {
     }, [])
 
     return (<div>
-        {postdata && userData? 
+        {postdata ? 
         <div className="singlePost">
             <h1>{postdata.title}</h1>
             <p>{postdata.body}</p>
 
-            <div className="flex"> 
-                <span>Post By {userData.name}</span>
+            <div className="post"> 
+                <span>Post By {userName}</span>
+
                 <span onClick={
                     (e) => {
                         console.log('clicked')
                         setCommentsFlag(!commentsFlag);
                     }
                 }>{commentsFlag? <span>Hide Comments </span> : <span> Show Comments </span> }</span>
+
+                <Delete userId = {userId} userName = {userName} postId = {postId}/>
             </div>
 
             {commentsFlag? <div style={{
